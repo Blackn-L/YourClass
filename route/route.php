@@ -12,7 +12,8 @@
 Route::get('think', function () {
     return 'hello,ThinkPHP5!';
 });
-
+// 注册
+Route::post('api/register', 'api/register/index');
 Route::get('hello/:name', 'index/hello');
 
 return [
