@@ -23,4 +23,8 @@ return [
     'type'           => '',
     // 是否自动开启 SESSION
     'auto_start'     => true,
+    // session 过期时间,当前时间加5个小时
+    'expire' => time()+5*60*60,
+    // 是否使用Cookie
+    'use_cookies' => true,
 ];
