@@ -12,7 +12,11 @@ class Register extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+	    'email' => 'require|email',
+        'username' => 'require|min:5|max:30|chsAlphaNum',
+        'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/'
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +24,16 @@ class Register extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'email.require' => '邮箱不能为空',
+        'email.email' => '邮箱格式不正确',
+        'username.require' => '用户名不能为空',
+        'username.min' => '用户名不能小于5个字符',
+        'username.max' => '用户名不能大于30个字符',
+        'username.chsAlphaNum' => '用户名必须是汉字、字母、数字',
+        'password.require' => '密码不能为空',
+        'password.min' => '密码不能小于8个字符',
+        'password.max' => '密码不能大于30个字符',
+        'password.regex' => '密码必须包含数字和字母'
+    ];
 }

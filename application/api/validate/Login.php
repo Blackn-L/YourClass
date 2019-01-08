@@ -4,7 +4,7 @@ namespace app\api\validate;
 
 use think\Validate;
 
-class User extends Validate
+class Login extends Validate
 {
     /**
      * 定义验证规则
@@ -12,7 +12,10 @@ class User extends Validate
      *
      * @var array
      */	
-	protected $rule = [];
+	protected $rule = [
+        'email' => 'require|email',
+        'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/'
+    ];
     
     /**
      * 定义错误信息
@@ -20,5 +23,12 @@ class User extends Validate
      *
      * @var array
      */	
-    protected $message = [];
+    protected $message = [
+        'email.require' => '邮箱不能为空',
+        'email.email' => '邮箱格式不正确',
+        'password.require' => '密码不能为空',
+        'password.min' => '密码不能小于8个字符',
+        'password.max' => '密码不能大于30个字符',
+        'password.regex' => '密码必须包含数字和字母'
+    ];
 }
