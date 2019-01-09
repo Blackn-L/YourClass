@@ -18,7 +18,7 @@ return [
         '__file__'   => ['common.php'],
         '__dir__'    => ['behavior', 'controller', 'model', 'view'],
         'controller' => ['Register', 'Test', 'UserType'],
-        'model'      => ['User', 'UserType'],
+        'model'      => ['Login', 'UserType'],
         'view'       => ['index/index'],
     ],
 
