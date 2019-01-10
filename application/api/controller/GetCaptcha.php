@@ -1,9 +1,10 @@
 <?php
 
 namespace app\api\controller;
+use think\Controller;
 use think\captcha\Captcha;
 
-class GetVerify
+class GetCaptcha extends Controller
 {
     public function verify() {
         $captcha = new Captcha();

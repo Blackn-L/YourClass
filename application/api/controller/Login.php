@@ -7,6 +7,10 @@ class Login extends Controller
 {
     public function index() {
         $data = $this->request->param();
+        // 判断验证码是否正确
+        if (!captcha_check($data['code'])) {
+            return JsonData(400,null,'验证码错误');
+        }
         $validate = new \app\api\validate\Login;
         if (!$validate->check($data)) {
             return JsonData(400,null,$validate->getError());
