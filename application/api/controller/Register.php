@@ -32,4 +32,19 @@ class Register extends Controller
         };
         return JsonData(400,null,"系统运行错误!");
     }
+    public function sendEmail() {
+        $title = '测试邮件';
+        $toEmail = '1481940986@qq.com';
+        $code = mt_rand(100000,999999);
+        $name = '测试用户';
+        $body = '您的验证码是：'.$code;
+        $result=send_mail($toEmail, $name, $title, $body);
+        if($result){
+            //记录邮件验证码
+            session('emailCode',$code);
+            return JsonData(200,null,'发送成功！');
+        }else{
+            return JsonData(400,null,'发送失败');
+        }
+    }
 }
