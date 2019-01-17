@@ -14,7 +14,8 @@ class Login extends Validate
      */	
 	protected $rule = [
         'email' => 'require|email',
-        'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/'
+        'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/',
+        'code' => 'require'
     ];
     
     /**
@@ -29,6 +30,7 @@ class Login extends Validate
         'password.require' => '密码不能为空',
         'password.min' => '密码不能小于8个字符',
         'password.max' => '密码不能大于30个字符',
-        'password.regex' => '密码必须包含数字和字母'
+        'password.regex' => '密码必须包含数字和字母',
+        'code.require' => '验证码不能未空'
     ];
 }

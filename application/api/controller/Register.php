@@ -2,6 +2,8 @@
 namespace app\api\controller;
 use think\Controller;
 use app\api\model\User as UserModel;
+use think\facade\Session;
+
 class Register extends Controller
 {
     public function index()
@@ -10,6 +12,10 @@ class Register extends Controller
         $validate = new \app\api\validate\Register;
         if (!$validate->check($data)) {
             return JsonData(400,null,$validate->getError());
+        }
+        $trueEmailCode = Session::get('emailCode');
+        if ($data['emailCode'] != $trueEmailCode) {
+            return JsonData(400,null,'邮箱验证码错误！');
         }
         $email = $data['email'];
         $username = $data['username'];
@@ -44,7 +50,7 @@ class Register extends Controller
             session('emailCode',$code);
             return JsonData(200,null,'发送成功！');
         }else{
-            return JsonData(400,null,'发送失败');
+            return JsonData(400,null,'发送失败！');
         }
     }
 }

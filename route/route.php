@@ -15,7 +15,7 @@ Route::get('think', function () {
 // 注册
 Route::post('api/register', 'api/Register/index');
 // 发送邮件
-Route::get('api/getEmailCode', 'api/Register/sendEmail');
+Route::post('api/getEmailCode', 'api/Register/sendEmail');
 // 登陆
 Route::post('api/login', 'api/Login/index');
 Route::get('hello/:name', 'index/hello');

@@ -3,7 +3,7 @@ function JsonData($code, $data, $msg) {
     return [
         "Code" => $code,
         "Data" => $data,
-        "msg" => $msg
+        "Msg" => $msg
     ];
 }
 function send_mail($toEmail, $name, $title = '', $body = '') {
