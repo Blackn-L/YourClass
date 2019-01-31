@@ -20,7 +20,8 @@ Route::post('api/getEmailCode', 'api/Register/sendEmail');
 Route::post('api/login', 'api/Login/index');
 Route::get('hello/:name', 'index/hello');
 
-Route::get('api/getcaptcha','api/GetCaptcha/verify');
+Route::get('api/getcaptcha/verify','api/GetCaptcha/verify');
+Route::get('api/getcaptcha/check/:code','api/GetCaptcha/check');
 return [
 
 ];

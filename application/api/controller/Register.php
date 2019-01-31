@@ -34,13 +34,16 @@ class Register extends Controller
         $newUser['password'] = md5($password);
         $status = $newUser->allowField(true)->save($newUser);
         if ($status) {
+            // 注册成功后清空session中的正确code，防止一个code重复注册
+            Session::delete('emailCode');
             return JsonData(200,null,"注册成功！");
+
         };
         return JsonData(400,null,"系统运行错误!");
     }
     public function sendEmail() {
         $title = '测试邮件';
-        $toEmail = '1481940986@qq.com';
+        $toEmail = '893637294@qq.com';
         $code = mt_rand(100000,999999);
         $name = '测试用户';
         $body = '您的验证码是：'.$code;
@@ -48,9 +51,9 @@ class Register extends Controller
         if($result){
             //记录邮件验证码
             session('emailCode',$code);
-            return JsonData(200,null,'发送成功！');
+            return JsonData(200,true,'发送成功！');
         }else{
-            return JsonData(400,null,'发送失败！');
+            return JsonData(400,false,'发送失败！');
         }
     }
 }

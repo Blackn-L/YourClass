@@ -16,7 +16,6 @@ class Register extends Validate
 	    'email' => 'require|email',
         'username' => 'require|min:5|max:30|chsAlphaNum',
         'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/',
-        'code' => 'require',
         'emailCode' => 'require'
     ];
     
@@ -37,7 +36,6 @@ class Register extends Validate
         'password.min' => '密码不能小于8个字符',
         'password.max' => '密码不能大于30个字符',
         'password.regex' => '密码必须包含数字和字母',
-        'code.require' => '图形验证码不能未空',
         'emailCode.require' => '邮箱验证码不能未空'
     ];
 }
