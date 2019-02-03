@@ -20,8 +20,12 @@ Route::post('api/getEmailCode', 'api/Register/sendEmail');
 Route::post('api/login', 'api/Login/index');
 Route::get('hello/:name', 'index/hello');
 
+// 获取验证码
 Route::get('api/getcaptcha/verify','api/GetCaptcha/verify');
+// 校验验证码
 Route::get('api/getcaptcha/check/:code','api/GetCaptcha/check');
+//获取用户信息
+Route::get('api/getuserinfo', 'api/GetUserInfo');
 return [
 
 ];
