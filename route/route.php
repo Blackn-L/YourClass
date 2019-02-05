@@ -13,19 +13,25 @@ Route::get('think', function () {
     return 'hello,ThinkPHP5!';
 });
 // 注册
-Route::post('api/register', 'api/Register/index');
+Route::post('api/register', 'api/User/register');
 // 发送邮件
-Route::post('api/getEmailCode', 'api/Register/sendEmail');
+Route::post('api/getEmailCode', 'api/User/sendEmail');
 // 登陆
-Route::post('api/login', 'api/Login/index');
-Route::get('hello/:name', 'index/hello');
-
+Route::post('api/login', 'api/User/login');
+// 登出
+Route::get('api/loginOut', 'api/User/loginOut');
+// 获取用户信息
+Route::get('api/getUserInfo', 'api/User/getInfo');
+// 更新用户信息
+Route::post('api/updateUserInfo', 'api/User/updateInfo');
+// 校验密码
+Route::post('api/checkPwd', 'api/User/checkPwd');
+// 更新密码
+Route::post('api/updatePwd', 'api/User/updatePwd');
 // 获取验证码
-Route::get('api/getcaptcha/verify','api/GetCaptcha/verify');
+Route::get('api/getCaptcha/verify','api/GetCaptcha/verify');
 // 校验验证码
-Route::get('api/getcaptcha/check/:code','api/GetCaptcha/check');
-//获取用户信息
-Route::get('api/getuserinfo', 'api/GetUserInfo');
+Route::get('api/getCaptcha/check/:code','api/GetCaptcha/check');
 return [
 
 ];
