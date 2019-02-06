@@ -28,6 +28,8 @@ Route::post('api/updateUserInfo', 'api/User/updateInfo');
 Route::post('api/checkPwd', 'api/User/checkPwd');
 // 更新密码
 Route::post('api/updatePwd', 'api/User/updatePwd');
+// 更新教务信息
+Route::post('api/updateStuInfo', 'api/User/updateStuInfo');
 // 获取验证码
 Route::get('api/getCaptcha/verify','api/GetCaptcha/verify');
 // 校验验证码

@@ -74,7 +74,9 @@ class User extends Controller
         // 获取Session会话 ID
         Session::set('uid', $user->uid);
         Session::set('user_info',$user);
-
+        // 保存此次登陆Ip
+        $user['last_login_ip'] = $this->request->ip();
+        $user->save();
         return JsonData(200,true,'登陆成功');
     }
     // 登出
@@ -104,8 +106,8 @@ class User extends Controller
             return JsonData(400, null, '请先登陆！');
         }
         $uid = Session::get('uid');
-        $user = Session::get('user_info');
-//        $user = UserModel::get($uid);
+//        $user = Session::get('user_info');
+        $user = UserModel::get($uid);
         $info = [];
         $info['uid'] = $user['uid'];
         $info['username'] = $user['username'];
@@ -114,6 +116,7 @@ class User extends Controller
         $info['mobile'] = $user['mobile'];
         $info['wechat'] = $user['wechat'];
         $info['createTime'] = $user['create_time'];
+        $info['lastLoginIp'] = '上次登陆IP：'.$user['last_login_ip'];
         return JsonData(200, $info, '获取用户信息成功！');
     }
     // 更新用户信息
@@ -122,13 +125,18 @@ class User extends Controller
             return JsonData(400, false, '请先登陆！');
         }
         $data = $this->request->param();
-        $usernameRe = '/^[\u4E00-\u9FA5A-Za-z0-9_]+$/';
+        // PHP中匹配汉字与其他语言不一样
+        $usernameRe = '/^[\x{4e00}-\x{9fa5}A-Za-z0-9_]+$/u';
         $mobileRe = '/^1[0-9]{10}$/';
-        if (!preg_match($usernameRe, $data['username'])) {
+        $wechatRe = '/^[a-zA-Z]([-_a-zA-Z0-9]{5,19})+$/';
+        if ($data['username'] && !preg_match($usernameRe, $data['username'])) {
             return JsonData(400, false, '用户名格式错误！');
         }
-        if (!preg_match($mobileRe, $data['mobile'])) {
+        if ($data['mobile'] && !preg_match($mobileRe, $data['mobile'])) {
             return JsonData(400, false, '手机号格式错误！');
+        }
+        if ($data['wechat'] && !preg_match($wechatRe, $data['wechat'])) {
+            return JsonData(400, false, '微信号格式错误！');
         }
         $uid = Session::get('uid');
         $user = UserModel::get($uid);
@@ -157,7 +165,7 @@ class User extends Controller
         $uid = Session::get('uid');
         $user = UserModel::get($uid);
         if (!$user) {
-            return JsonData(400, false, '系统错误');
+            return JsonData(400, false, '系统运行错误');
         }
         if ($user['password'] == $password) {
             return JsonData(200, true, '密码正确');
@@ -181,9 +189,30 @@ class User extends Controller
         $user['password'] = $password;
         $flag = $user->save();
         if ($flag) {
+            Session::clear();
             return JsonData(200, true, '密码更改成功！');
         } else {
-            return JsonData(400, false, '系统错误！');
+            return JsonData(400, false, '系统运行错误！');
+        }
+    }
+    // 更新教务账号
+    public function updateStuInfo(Request $request) {
+        if (!$request->isLogin) {
+            return JsonData(400, false, '请先登陆！');
+        }
+        $data = $this->request->param();
+        if (!$data['studentId'] || !$data['studentPwd']) {
+            return JsonData(400, false, '请填写正确！');
+        }
+        $uid = Session::get('uid');
+        $user = UserModel::get($uid);
+        $user['jw_student_id'] = $data['studentId'];
+        $user['jw_student_pwd'] = $data['studentPwd'];
+        $flag = $user->save();
+        if ($flag) {
+            return JsonData(200, true, '修改成功！');
+        } else {
+            return JsonData(400, false, '系统运行错误！');
         }
     }
 }
