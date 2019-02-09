@@ -1,6 +1,5 @@
 <?php
 namespace app\api\controller;
-use http\Params;
 use think\Controller;
 use app\api\model\User as UserModel;
 use think\facade\Session;
@@ -103,7 +102,7 @@ class User extends Controller
     // 获取用户信息
     public function getInfo(Request $request) {
         if (!$request->isLogin) {
-            return JsonData(400, null, '请先登陆！');
+            return JsonData(300, null, '请先登陆！');
         }
         $uid = Session::get('uid');
 //        $user = Session::get('user_info');
@@ -122,7 +121,7 @@ class User extends Controller
     // 更新用户信息
     public function updateInfo(Request $request) {
         if (!$request->isLogin) {
-            return JsonData(400, false, '请先登陆！');
+            return JsonData(300, false, '请先登陆！');
         }
         $data = $this->request->param();
         // PHP中匹配汉字与其他语言不一样
@@ -158,7 +157,7 @@ class User extends Controller
     // 校验密码
     public function checkPwd(Request $request) {
         if (!$request->isLogin) {
-            return JsonData(400, false, '请先登陆！');
+            return JsonData(300, false, '请先登陆！');
         }
         $data = $this->request->param();
         $password = md5($data['password']);
@@ -176,7 +175,7 @@ class User extends Controller
     // 更新密码
     public function updatePwd(Request $request) {
         if (!$request->isLogin) {
-            return JsonData(400, false, '请先登陆！');
+            return JsonData(300, false, '请先登陆！');
         }
         $re = '/^(?=.*\d)(?=.*[a-zA-Z]).{8,25}$/';
         $data = $this->request->param();
@@ -198,7 +197,7 @@ class User extends Controller
     // 更新教务账号
     public function updateStuInfo(Request $request) {
         if (!$request->isLogin) {
-            return JsonData(400, false, '请先登陆！');
+            return JsonData(300, false, '请先登陆！');
         }
         $data = $this->request->param();
         if (!$data['studentId'] || !$data['studentPwd']) {
