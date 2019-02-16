@@ -26,3 +26,19 @@ function send_mail($toEmail, $name, $title = '', $body = '') {
     $mail->AddAddress($toEmail, $name);
     return $mail->Send() ? true : $mail->ErrorInfo;
 }
+
+// 封装curl的gei请求
+function url_get($url) {
+    $headerArray =array("Content-type:application/json;","Accept:application/json");
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+    // 参数为1表示传输数据，为0表示直接输出显示
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $output = curl_exec($ch);
+    curl_close($ch);
+    // 返回的json转成数组
+    $output = json_decode($output,true);
+    return $output;
+}
