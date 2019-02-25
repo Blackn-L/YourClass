@@ -35,49 +35,52 @@ class MainClass extends Controller
         $uid = Session::get('uid');
 //        $user = Session::get('user_info');
         $user = UserModel::get($uid);
+        # 账号密码错误
         if (!$user['jw_student_id'] && !$user['jw_student_pwd']) {
             return JsonData(400, false, '教务账号密码错误！');
         }
+        # 无cookies则去登陆获取
         if (!$user['jw_cookies']) {
             $username = '201540704357';
             $password = 'ss44520f';
             $loginUrl = 'http://127.0.0.1:8080/flask/api/login';
             $loginUrl = $loginUrl.'/'.$username.'/'.$password;
             $data = url_get($loginUrl);
-            $user['jw_cookies'] = $data['data'];
+            if (!$data) {
+                return JsonData(400, false, '爬虫系统暂未运行');
+            }
+            $user['jw_cookies'] = $data['Data'];
             $user->save();
             Session::clear();
             Session::set('uid', $user->uid);
             Session::set('user_info',$user);
         }
-        if (!$user['jw_cookies']) {
-            return JsonData(400, false, '爬虫系统暂未运行');
-        }
+        # 获取学生ID，存入数据库
         if (!$user['student_id']) {
             $getStuIdUrl = 'http://127.0.0.1:8080/flask/api/getstuid/'.$user['jw_cookies'];
             $stuId = url_get($getStuIdUrl);
-            if ($stuId['code'] == 200) {
-                $user['student_id'] = $stuId['data'];
+            if ($stuId['Code'] == 200) {
+                $user['student_id'] = $stuId['Data'];
                 $user->save();
             }
         }
         $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$user['jw_cookies'];
         $res = url_get($getClassUrl);
-        // 250 为cookie错误
-        if ($res['code'] == 250) {
+        // 250 为cookie错误，再次尝试登陆
+        if ($res['Code'] == 250) {
             $username = '201540704357';
             $password = 'ss44520f';
             $loginUrl = 'http://127.0.0.1:8080/flask/api/login';
             $loginUrl = $loginUrl.'/'.$username.'/'.$password;
             $data = url_get($loginUrl);
-            $user['jw_cookies'] = $data['data'];
+            if (!$user['jw_cookies']) {
+                return JsonData(400, false, '爬虫系统暂未运行');
+            }
+            $user['jw_cookies'] = $data['Data'];
             $user->save();
             Session::clear();
             Session::set('uid', $user->uid);
             Session::set('user_info',$user);
-            if (!$user['jw_cookies']) {
-                return JsonData(400, false, '爬虫系统暂未运行');
-            }
             $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$user['jw_cookies'];
             $res = url_get($getClassUrl);
         }
