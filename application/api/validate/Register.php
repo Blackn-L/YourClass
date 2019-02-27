@@ -14,9 +14,8 @@ class Register extends Validate
      */	
 	protected $rule = [
 	    'email' => 'require|email',
-        'username' => 'require|min:5|max:30|chsAlphaNum',
-        'password' => 'require|min:8|max:30|regex:/^(?![^a-zA-Z]+$)(?!\D+$)/',
-        'code' => 'require',
+        'username' => 'require|min:3|max:25|chsAlphaNum',
+        'password' => 'require|min:8|max:25|regex:/^(?=.*\d)(?=.*[a-zA-Z]).{8,25}$/',
         'emailCode' => 'require'
     ];
     
@@ -30,14 +29,13 @@ class Register extends Validate
         'email.require' => '邮箱不能为空',
         'email.email' => '邮箱格式不正确',
         'username.require' => '用户名不能为空',
-        'username.min' => '用户名不能小于5个字符',
-        'username.max' => '用户名不能大于30个字符',
-        'username.chsAlphaNum' => '用户名必须是汉字、字母、数字',
+        'username.min' => '用户名不能小于3个字符',
+        'username.max' => '用户名不能大于25个字符',
+        'username.chsAlphaNum' => '用户名只能输入中文，英文，数字以及下划线',
         'password.require' => '密码不能为空',
-        'password.min' => '密码不能小于8个字符',
-        'password.max' => '密码不能大于30个字符',
-        'password.regex' => '密码必须包含数字和字母',
-        'code.require' => '图形验证码不能未空',
+        'password.min' => '密码不能小于5个字符',
+        'password.max' => '密码不能大于25个字符',
+        'password.regex' => '密码必须包含字母和数字，不能使用特殊字符',
         'emailCode.require' => '邮箱验证码不能未空'
     ];
 }

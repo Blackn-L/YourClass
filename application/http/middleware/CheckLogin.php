@@ -2,13 +2,15 @@
 
 namespace app\http\middleware;
 use think\facade\Session;
-class Check
+class CheckLogin
 {
     public function handle($request, \Closure $next)
     {
         if (Session::has('uid')) {
-            return $next($request);
+            $request->isLogin = true;
+        } else {
+            $request->isLogin = false;
         }
-        return JsonData('301',null,'您还未登陆，请先登陆');
+        return $next($request);
     }
 }
