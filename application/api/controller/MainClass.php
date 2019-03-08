@@ -26,8 +26,8 @@ class MainClass extends Controller
         }
         # 无cookies则去登陆获取
         if (!$user['jw_cookies']) {
-            $username = '201540704357';
-            $password = 'ss44520f';
+            $username = $user['jw_student_id'];
+            $password = $user['jw_student_pwd'];
             $loginUrl = 'http://127.0.0.1:8080/flask/api/login';
             $loginUrl = $loginUrl.'/'.$username.'/'.$password;
             $data = url_get($loginUrl);

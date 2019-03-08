@@ -85,8 +85,10 @@ class User extends Controller
     }
     // 发送邮箱验证码
     public function sendEmail() {
+        $data = $this->request->param();
         $title = '测试邮件';
-        $toEmail = '893637294@qq.com';
+//        $toEmail = '893637294@qq.com';
+        $toEmail = $data['email'];
         $code = mt_rand(100000,999999);
         $name = '测试用户';
         $body = '您的验证码是：'.$code;
@@ -221,7 +223,7 @@ class User extends Controller
         $isEmail = UserModel::where('email', $data['email'])->find();
         if ($isEmail != null) {
             $title = '忘记密码';
-            $toEmail = '893637294@qq.com';
+            $toEmail = $data['email'];
             $code = mt_rand(100000,999999);
             $name = '测试用户';
             $body = '您的验证码是：'.$code;
@@ -252,7 +254,7 @@ class User extends Controller
             $newPwd .= $pattern{mt_rand(0,35)};    //生成php随机数
         }
         $title = '新密码';
-        $toEmail = '893637294@qq.com';
+        $toEmail = $data['email'];
         $code = $newPwd;
         $name = '测试用户';
         $body = '您的新密码是：'.$code;
