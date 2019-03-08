@@ -17,21 +17,6 @@ class MainClass extends Controller
         if (!$request->isLogin) {
             return JsonData(300, false, '请先登陆！');
         }
-//        $class['Time'] = '1、2<br>08:00<br>┆<br>09:50';
-//        $class['Mon'] = '周一<br>博学楼<br>302<br>兰属吏';
-//        $class['Tues'] = '周二<br>博学楼<br>302<br>兰属吏';
-//        $class['Wed'] = '周三<br>博学楼<br>302<br>兰属吏';
-//        $class['Thur'] = '周四<br>博学楼1312312<br>302<br>兰属吏';
-//        $class['Fri'] = '周五<br>博学楼<br>302<br>兰属吏';
-//        $class['Sat'] = '周六<br>博学楼<br>302<br>兰属吏';
-//        $class['Sun'] = '';
-//        $lists['First'] = $class;
-//        $lists['Second'] = $class;
-//        $lists['Third'] = $class;
-//        $lists['Fourth'] = $class;
-//        $class['Wed'] = '<br>';
-//        $lists['Fifth'] = $class;
-//
         $uid = Session::get('uid');
 //        $user = Session::get('user_info');
         $user = UserModel::get($uid);

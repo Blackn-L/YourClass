@@ -20,6 +20,10 @@ Route::post('api/getEmailCode', 'api/User/sendEmail');
 Route::post('api/login', 'api/User/login');
 // 登出
 Route::get('api/loginOut', 'api/User/loginOut');
+// 判断邮箱是否已经注册
+Route::post('api/checkEmail', 'api/User/checkEmailIsReg');
+// 校验邮箱验证码，发送新密码至邮箱
+Route::post('api/checkCode', 'api/User/checkCode');
 // 获取用户信息
 Route::get('api/getUserInfo', 'api/User/getInfo');
 // 更新用户信息
