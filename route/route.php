@@ -39,7 +39,7 @@ Route::get('api/getCaptcha/verify','api/GetCaptcha/verify');
 // 校验验证码
 Route::get('api/getCaptcha/check/:code','api/GetCaptcha/check');
 // 获取课程表列表
-Route::get('api/getClassList','api/MainClass/getClassList');
+Route::post('api/getClassList','api/MainClass/getClassList');
 return [
 
 ];
