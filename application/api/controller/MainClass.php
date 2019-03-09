@@ -27,7 +27,9 @@ class MainClass extends Controller
         }
         # 无cookies则去登陆获取
         $jwCookie = $user['jw_cookies'];
-        if (!$jwCookie) {
+        // 校验Cookie是否过期
+        $isOk = $this->checkCookie($jwCookie);
+        if (!$isOk) {
             $jwCookie = $this->toLogin($uid);
             if (!$jwCookie) {
                 JsonData(400, false, '登陆失败！');
@@ -65,6 +67,12 @@ class MainClass extends Controller
     public function checkCookie($jwCookie) {
         // 如果过期，则返回false，重新登陆
         // 如果没过期，则返回true
+        $checkUrl = 'http://127.0.0.1:8080/flask/api/checkcookie/'.$jwCookie;
+        $res = url_get($checkUrl);
+        if ($res['Code'] == 250) {
+            return false;
+        }
+        return true;
     }
     // 获取课程表
     public function getClass($jwCookie, $yearId, $termId, $uid) {
