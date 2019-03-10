@@ -205,16 +205,27 @@ class User extends Controller
         if (!$data['studentId'] || !$data['studentPwd']) {
             return JsonData(400, false, '请填写正确！');
         }
-        $uid = Session::get('uid');
-        $user = UserModel::get($uid);
-        $user['jw_student_id'] = $data['studentId'];
-        $user['jw_student_pwd'] = $data['studentPwd'];
-        $flag = $user->save();
-        if ($flag) {
-            return JsonData(200, true, '修改成功！');
+        // 登陆，查看账号密码是否正确
+        $loginUrl = 'http://127.0.0.1:8080/flask/api/login';
+        $loginUrl = $loginUrl.'/'.$data['studentId'].'/'.$data['studentPwd'];
+        $res = url_get($loginUrl);
+        // 正确则将账号密码以及cookies存入数据库
+        if ($res['Code'] === 200) {
+            $uid = Session::get('uid');
+            $user = UserModel::get($uid);
+            $user['jw_student_id'] = $data['studentId'];
+            $user['jw_student_pwd'] = $data['studentPwd'];
+            $user['jw_cookies'] = $res['Data'];
+            $flag = $user->save();
+            if ($flag) {
+                return JsonData(200, true, '修改成功！');
+            } else {
+                return JsonData(400, false, '系统运行错误！');
+            }
         } else {
-            return JsonData(400, false, '系统运行错误！');
+            return $res;
         }
+
     }
 
     // 判断邮箱是否已经注册
