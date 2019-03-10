@@ -9,7 +9,7 @@ class User extends Controller
 {
     // 中间件 判断是否登陆
     protected $middleware = [
-        'CheckLogin' => [ 'except' => ['register', 'login', 'loginOut', 'sendEmail'] ],
+        'CheckLogin' => [ 'except' => ['register', 'login', 'loginOut', 'sendEmail', 'checkEmailIsReg', 'checkCode'] ],
     ];
     // 注册
     public function register()
@@ -85,8 +85,10 @@ class User extends Controller
     }
     // 发送邮箱验证码
     public function sendEmail() {
+        $data = $this->request->param();
         $title = '测试邮件';
-        $toEmail = '893637294@qq.com';
+//        $toEmail = '893637294@qq.com';
+        $toEmail = $data['email'];
         $code = mt_rand(100000,999999);
         $name = '测试用户';
         $body = '您的验证码是：'.$code;
@@ -203,15 +205,83 @@ class User extends Controller
         if (!$data['studentId'] || !$data['studentPwd']) {
             return JsonData(400, false, '请填写正确！');
         }
-        $uid = Session::get('uid');
-        $user = UserModel::get($uid);
-        $user['jw_student_id'] = $data['studentId'];
-        $user['jw_student_pwd'] = $data['studentPwd'];
-        $flag = $user->save();
-        if ($flag) {
-            return JsonData(200, true, '修改成功！');
+        // 登陆，查看账号密码是否正确
+        $loginUrl = 'http://127.0.0.1:8080/flask/api/login';
+        $loginUrl = $loginUrl.'/'.$data['studentId'].'/'.$data['studentPwd'];
+        $res = url_get($loginUrl);
+        // 正确则将账号密码以及cookies存入数据库
+        if ($res['Code'] === 200) {
+            $uid = Session::get('uid');
+            $user = UserModel::get($uid);
+            $user['jw_student_id'] = $data['studentId'];
+            $user['jw_student_pwd'] = $data['studentPwd'];
+            $user['jw_cookies'] = $res['Data'];
+            $flag = $user->save();
+            if ($flag) {
+                return JsonData(200, true, '修改成功！');
+            } else {
+                return JsonData(400, false, '系统运行错误！');
+            }
         } else {
-            return JsonData(400, false, '系统运行错误！');
+            return $res;
         }
+
+    }
+
+    // 判断邮箱是否已经注册
+    public function checkEmailIsReg() {
+        $data = $this->request->param();
+        $isEmail = UserModel::where('email', $data['email'])->find();
+        if ($isEmail != null) {
+            $title = '忘记密码';
+            $toEmail = $data['email'];
+            $code = mt_rand(100000,999999);
+            $name = '测试用户';
+            $body = '您的验证码是：'.$code;
+            $result=send_mail($toEmail, $name, $title, $body);
+            if($result){
+                //记录邮件验证码
+                session('emailCode',$code);
+                return JsonData(200,true,'发送成功！');
+            }else{
+                return JsonData(400,false,'发送失败！');
+            }
+        };
+        return JsonData(400,false,'当前邮箱未注册！');
+    }
+
+    // 校验验证码，发送新密码至邮箱
+    public function checkCode() {
+        $data = $this->request->param();
+        $trueEmailCode = Session::get('emailCode');
+        if ($data['emailCode'] != $trueEmailCode) {
+            return JsonData(400,false,'邮箱验证码错误！');
+        }
+        $length = mt_rand(10, 24);
+        $pattern = '1234567890abcdefghijklmnopqrstuvwxyz   
+               ABCDEFGHIJKLOMNOPQRSTUVWXYZ';
+        $newPwd = '';
+        for ($i = 0; $i < $length; $i++) {
+            $newPwd .= $pattern{mt_rand(0,35)};    //生成php随机数
+        }
+        $title = '新密码';
+        $toEmail = $data['email'];
+        $code = $newPwd;
+        $name = '测试用户';
+        $body = '您的新密码是：'.$code;
+        $result=send_mail($toEmail, $name, $title, $body);
+        if ($result) {
+            Session::clear();
+            $password = md5($newPwd);
+            $uid = Session::get('uid');
+            $user = UserModel::get($uid);
+            $user['password'] = $password;
+            $flag = $user->save();
+            if ($flag) {
+                return JsonData(200,true,'邮箱验证码正确，已发送新密码至邮箱');
+            }
+            return JsonData(400,false,'系统运行错误，请重试');
+        }
+        return JsonData(400,false,'新密码发送失败，请重试！');
     }
 }

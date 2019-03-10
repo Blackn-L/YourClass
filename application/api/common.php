@@ -27,7 +27,7 @@ function send_mail($toEmail, $name, $title = '', $body = '') {
     return $mail->Send() ? true : $mail->ErrorInfo;
 }
 
-// 封装curl的gei请求
+// 封装curl的get请求
 function url_get($url) {
     $headerArray =array("Content-type:application/json;","Accept:application/json");
     $ch = curl_init();
