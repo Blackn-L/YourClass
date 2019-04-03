@@ -43,6 +43,7 @@ class MainClass extends Controller
         $jwClass = $this->getClass($jwCookie, $data['yearId'], $data['termId'], $uid);
         return $jwClass;
 
+
     }
     // 登陆
     public function toLogin($uid) {
@@ -97,7 +98,7 @@ class MainClass extends Controller
             $status = $newClass->allowField(true)->save($newClass);
             return $res;
         } else {
-            return JsonData(400, $res['Code'], '课程信息获取失败');
+            return JsonData(400, false, '课程信息获取失败');
         }
 
     }
@@ -113,7 +114,39 @@ class MainClass extends Controller
         }
     }
     // 获取学生成绩
-    public function getStuGrade($uid) {
+    public function getStuMark(Request $request) {
+        //  前端传值，学年和学期
+        if (!$request->isLogin) {
+            return JsonData(300, false, '请先登陆！');
+        }
+        $data = $this->request->param();
+        $uid = Session::get('uid');
         $user = UserModel::get($uid);
+        $oneId = intval(strval($uid).$data['yearId'].$data['termId']);
+        $jwCookie = $user['jw_cookies'];
+        $classInfo = ClassModel::where('one_id', $oneId)->find();
+        if (!!$classInfo['marks'] && $classInfo['marks'] != '[]') {
+            return JsonData(200, $classInfo['marks'], '课程成绩成功');
+        }
+        $getMarkUrl = 'http://127.0.0.1:8080/flask/api/getmark/'.$jwCookie.'/'.$data['yearId'].'/'.$data['termId'];
+        $res = url_get($getMarkUrl);
+        // 是更新还是新增
+        $status = true;
+        if (!$classInfo) {
+            $status = false;
+        }
+        if ($res['Code'] == 200) {
+            // 将课程信息，学期，学年等存入数据库
+            $classInfo['one_id'] = $oneId;
+            $classInfo['uid'] = $uid;
+            $classInfo['year_id'] = $data['yearId'];
+            $classInfo['term_id'] = $data['termId'];
+            $classInfo['marks'] = json_encode($res['Data'], JSON_UNESCAPED_UNICODE); // 将数组转成json格式存入数据库,且不转为unicode
+
+            $result = $classInfo->isUpdate($status)->allowField(true)->save($classInfo);
+            return $res;
+        } else {
+            return JsonData(400, false, '课程成绩获取失败');
+        }
     }
 }
