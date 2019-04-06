@@ -27,12 +27,10 @@ class MainClass extends Controller
         }
         # 无cookies则去登陆获取
         $jwCookie = $user['jw_cookies'];
-        // 校验Cookie是否过期
-        $isOk = $this->checkCookie($jwCookie);
-        if (!$isOk) {
+        if (!$jwCookie) {
             $jwCookie = $this->toLogin($uid);
             if (!$jwCookie) {
-                JsonData(400, false, '登陆失败！');
+                return JsonData(400, false, '登陆失败！');
             }
         }
         # 获取学生ID，存入数据库
@@ -65,15 +63,18 @@ class MainClass extends Controller
         }
     }
     // 判断cookie是否过期
-    public function checkCookie($jwCookie) {
-        // 如果过期，则返回false，重新登陆
-        // 如果没过期，则返回true
-        $checkUrl = 'http://127.0.0.1:8080/flask/api/checkcookie/'.$jwCookie;
+    public function checkCookie($jwCookie,$uid) {
+        // 如果过期，则重新登陆,返回正确cookie
+        $currentCookie = $jwCookie;
+        $checkUrl = 'http://127.0.0.1:8080/flask/api/checkcookie/'.$currentCookie;
         $res = url_get($checkUrl);
         if ($res['Code'] == 250) {
-            return false;
+            $currentCookie = $this->toLogin($uid);
+            if (!$jwCookie) {
+                return false;
+            }
         }
-        return true;
+        return $currentCookie;
     }
     // 获取课程表
     public function getClass($jwCookie, $yearId, $termId, $uid) {
@@ -85,7 +86,9 @@ class MainClass extends Controller
             return JsonData(200, $info, '课程信息获取成功');
         }
         // 数据库无此课程表
-        $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$jwCookie.'/'.$yearId.'/'.$termId;
+        // 获取有效的Cookie
+        $currentCookie = $this->checkCookie($jwCookie, $uid);
+        $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$currentCookie.'/'.$yearId.'/'.$termId;
         $res = url_get($getClassUrl);
         if ($res['Code'] == 200) {
             // 将课程信息，学期，学年等存入数据库
