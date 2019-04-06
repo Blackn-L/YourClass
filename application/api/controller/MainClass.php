@@ -34,11 +34,12 @@ class MainClass extends Controller
             }
         }
         # 获取学生ID，存入数据库
+        $stuId = $user['student_id'];
         if (!$user['student_id']) {
-            $this->getStuId($uid);
+            $stuId = $this->getStuId($uid);
         }
         # 获取课程表
-        $jwClass = $this->getClass($jwCookie, $data['yearId'], $data['termId'], $uid);
+        $jwClass = $this->getClass($jwCookie, $data['yearId'], $data['termId'], $uid, $stuId);
         return $jwClass;
 
 
@@ -77,7 +78,7 @@ class MainClass extends Controller
         return $currentCookie;
     }
     // 获取课程表
-    public function getClass($jwCookie, $yearId, $termId, $uid) {
+    public function getClass($jwCookie, $yearId, $termId, $uid, $stuId) {
         $oneId = intval(strval($uid).$yearId.$termId);
         $classInfo = ClassModel::where('one_id', $oneId)->find();
         // 课程表已存在
@@ -88,7 +89,7 @@ class MainClass extends Controller
         // 数据库无此课程表
         // 获取有效的Cookie
         $currentCookie = $this->checkCookie($jwCookie, $uid);
-        $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$currentCookie.'/'.$yearId.'/'.$termId;
+        $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$currentCookie.'/'.$yearId.'/'.$termId.'/'.$stuId;
         $res = url_get($getClassUrl);
         if ($res['Code'] == 200) {
             // 将课程信息，学期，学年等存入数据库
@@ -114,6 +115,7 @@ class MainClass extends Controller
         if ($stuId['Code'] == 200) {
             $user['student_id'] = $stuId['Data'];
             $user->save();
+            return $user['student_id'];
         }
     }
     // 获取学生成绩
@@ -126,17 +128,21 @@ class MainClass extends Controller
         $uid = Session::get('uid');
         $user = UserModel::get($uid);
         $oneId = intval(strval($uid).$data['yearId'].$data['termId']);
-        $jwCookie = $user['jw_cookies'];
         $classInfo = ClassModel::where('one_id', $oneId)->find();
         if (!!$classInfo['marks'] && $classInfo['marks'] != '[]') {
-            return JsonData(200, $classInfo['marks'], '课程成绩成功');
+            $info = json_decode($classInfo['marks'], true);
+            return JsonData(200, $info, '课程成绩成功');
         }
-        $getMarkUrl = 'http://127.0.0.1:8080/flask/api/getmark/'.$jwCookie.'/'.$data['yearId'].'/'.$data['termId'];
+        $jwCookie = $user['jw_cookies'];
+        // 获取有效的Cookie
+        $currentCookie = $this->checkCookie($jwCookie, $uid);
+        $getMarkUrl = 'http://127.0.0.1:8080/flask/api/getmark/'.$currentCookie.'/'.$data['yearId'].'/'.$data['termId'];
         $res = url_get($getMarkUrl);
         // 是更新还是新增
-        $status = true;
         if (!$classInfo) {
-            $status = false;
+            // 新增则实例化模型
+            // ThinkPHP根据条件自动判断是新增还是更新
+            $classInfo = new ClassModel;
         }
         if ($res['Code'] == 200) {
             // 将课程信息，学期，学年等存入数据库
@@ -145,8 +151,7 @@ class MainClass extends Controller
             $classInfo['year_id'] = $data['yearId'];
             $classInfo['term_id'] = $data['termId'];
             $classInfo['marks'] = json_encode($res['Data'], JSON_UNESCAPED_UNICODE); // 将数组转成json格式存入数据库,且不转为unicode
-
-            $result = $classInfo->isUpdate($status)->allowField(true)->save($classInfo);
+            $result = $classInfo->allowField(true)->save($classInfo);
             return $res;
         } else {
             return JsonData(400, false, '课程成绩获取失败');
