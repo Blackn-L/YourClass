@@ -69,11 +69,12 @@ class MainClass extends Controller
         $currentCookie = $jwCookie;
         $checkUrl = 'http://127.0.0.1:8080/flask/api/checkcookie/'.$currentCookie;
         $res = url_get($checkUrl);
-        if ($res['Code'] == 250) {
-            $currentCookie = $this->toLogin($uid);
-            if (!$jwCookie) {
+        if ($res['Code'] != 200) {
+            $result = $this->toLogin($uid);
+            if (!$result) {
                 return false;
             }
+            $currentCookie = $result;
         }
         return $currentCookie;
     }
@@ -89,6 +90,9 @@ class MainClass extends Controller
         // 数据库无此课程表
         // 获取有效的Cookie
         $currentCookie = $this->checkCookie($jwCookie, $uid);
+        if (!$currentCookie) {
+            return JsonData(400, false, '课程信息获取失败');
+        }
         $getClassUrl = 'http://127.0.0.1:8080/flask/api/getclasslist/'.$currentCookie.'/'.$yearId.'/'.$termId.'/'.$stuId;
         $res = url_get($getClassUrl);
         if ($res['Code'] == 200) {
