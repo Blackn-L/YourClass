@@ -87,7 +87,6 @@ class User extends Controller
     public function sendEmail() {
         $data = $this->request->param();
         $title = '测试邮件';
-//        $toEmail = '893637294@qq.com';
         $toEmail = $data['email'];
         $code = mt_rand(100000,999999);
         $name = '测试用户';

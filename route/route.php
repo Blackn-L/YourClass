@@ -40,6 +40,8 @@ Route::get('api/getCaptcha/verify','api/GetCaptcha/verify');
 Route::get('api/getCaptcha/check/:code','api/GetCaptcha/check');
 // 获取课程表列表
 Route::post('api/getClassList','api/MainClass/getClassList');
+// 获取学生成绩
+Route::post('api/getStuMark', 'api/MainClass/getStuMark');
 return [
 
 ];
