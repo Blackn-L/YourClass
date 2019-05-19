@@ -42,6 +42,8 @@ Route::get('api/getCaptcha/check/:code','api/GetCaptcha/check');
 Route::post('api/getClassList','api/MainClass/getClassList');
 // 获取学生成绩
 Route::post('api/getStuMark', 'api/MainClass/getStuMark');
+// 获取课程修读进程
+Route::get('api/getCredit', 'api/MainClass/getCredit');
 return [
 
 ];

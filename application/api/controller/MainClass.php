@@ -161,4 +161,13 @@ class MainClass extends Controller
             return JsonData(400, false, '课程成绩获取失败');
         }
     }
+    // 获取课程修读进程
+    public function getCredit() {
+        $uid = Session::get('uid');
+        $user = UserModel::get($uid);
+        $jwCookie = $user['jw_cookies'];
+        $getCreditUrl = 'http://127.0.0.1:8080/flask/api/getcredit/'.$jwCookie;
+        $res = url_get($getCreditUrl);
+        return $res;
+    }
 }
