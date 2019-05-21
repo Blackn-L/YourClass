@@ -165,9 +165,18 @@ class MainClass extends Controller
     public function getCredit() {
         $uid = Session::get('uid');
         $user = UserModel::get($uid);
+        // 如果数据库已存在
+        if (!!$user['student_credit']) {
+            $info = json_decode($user['student_credit'], true);
+            return JsonData(200, $info, '课程修读进程获取成功');
+        }
         $jwCookie = $user['jw_cookies'];
         $getCreditUrl = 'http://127.0.0.1:8080/flask/api/getcredit/'.$jwCookie;
         $res = url_get($getCreditUrl);
+        if ($res['Code'] == 200) {
+            $user['student_credit'] = json_encode($res['Data'], JSON_UNESCAPED_UNICODE);
+            $user->save();
+        }
         return $res;
     }
 }
